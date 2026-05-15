@@ -26,17 +26,25 @@ export async function registerController(req, res) {
     // hashing the password
     const hashedPW = await crypto.createHash("sha256").update(password).digest("hex");
 
-    // generate JWT token
-    const token = jwt.sign({ userName, email }, process.env.JWT_SECRET, { expiresIn: "1h" });
-
     // create new user
     const newUser = new UserModel({ userName, email, password: hashedPW });
 
     // save the user to the database
     await newUser.save();
 
+    // generate JWT token with userId (after user is saved and has _id)
+    const token = jwt.sign(
+      { userId: newUser._id, userName, email }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: "1h" }
+    );
+
     // send response with token and user data
-    res.status(201).json({ message: "User registered successfully", data : { userName, email }, token });
+    res.status(201).json({ 
+      message: "User registered successfully", 
+      data : { userId: newUser._id, userName, email }, 
+      token 
+    });
 
   } catch (error) {
     // if any error occurs, send error response
@@ -63,11 +71,15 @@ export async function loginController(req, res) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // generate JWT token
-    const token = jwt.sign({ userName: user.userName, email: user.email }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    // generate JWT token with userId
+    const token = jwt.sign({ userId: user._id, userName: user.userName, email: user.email }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
     // send response with token and user data
-    res.status(200).json({ message: "Login successful", data : { userName: user.userName, email: user.email }, token });
+    res.status(200).json({ 
+      message: "Login successful", 
+      data : { userId: user._id, userName: user.userName, email: user.email }, 
+      token 
+    });
 
   } catch (error) {
     // if any error occurs, send error response
