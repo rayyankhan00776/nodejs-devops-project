@@ -1,6 +1,7 @@
 import UserModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import configs from "../config/config.js";
 
 // make controller for authentication and authorization
 export async function registerController(req, res) {
@@ -35,7 +36,7 @@ export async function registerController(req, res) {
     // generate JWT token with userId (after user is saved and has _id)
     const token = jwt.sign(
       { userId: newUser._id, userName, email }, 
-      process.env.JWT_SECRET, 
+      configs.JWT_SECRET, 
       { expiresIn: "1h" }
     );
 
@@ -72,7 +73,7 @@ export async function loginController(req, res) {
     }
 
     // generate JWT token with userId
-    const token = jwt.sign({ userId: user._id, userName: user.userName, email: user.email }, process.env.JWT_SECRET, { expiresIn: "1d" });
+  const token = jwt.sign({ userId: user._id, userName: user.userName, email: user.email }, configs.JWT_SECRET, { expiresIn: "1d" });
 
     // send response with token and user data
     res.status(200).json({ 
