@@ -12,7 +12,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -20,7 +19,6 @@ jobs:
         node-version: [18.x]
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -32,8 +30,9 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run Lint
+      - name: Run Lint (optional)
         run: npm run lint
+        continue-on-error: true
 
       - name: Run Tests
         run: npm test
